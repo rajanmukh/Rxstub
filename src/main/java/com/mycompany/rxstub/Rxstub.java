@@ -22,28 +22,40 @@ public class Rxstub {
 //server socket
 
     public Rxstub() {
+        int date = 1;
 
         try {
             sock = new ServerSocket(6006);
-            String fname = "beacondata_LE_2023_07_07.txt";
+
             while (true) {
                 try {
                     Socket ss = sock.accept();
                     DataOutputStream dos = new DataOutputStream(ss.getOutputStream());
+                    String fname = "D:\\BeaconData\\beacondata_LE_2023_09_" + String.format("%02d", date) + ".txt";
                     FileReader fr = new FileReader(fname);
                     BufferedReader br = new BufferedReader(fr);
-                    String readLine = "";
                     int i = 0;
-                    while (readLine != null) {
-                        readLine = br.readLine();
-                        if (!"".equals(readLine)) {
+                    while (true) {
+                        String readLine = br.readLine();
+                        boolean fileend = false;
+                        if (readLine == null) {
+                            fileend = true;
+                        } 
+
+                        if (fileend) {
+                            //go to next file
+                            fname = "D:\\BeaconData\\beacondata_LE_2023_09_" + String.format("%02d", ++date) + ".txt";
+                            fr = new FileReader(fname);
+                            br = new BufferedReader(fr);
+                            continue;
+                        } else if (!"".equals(readLine)) {
                             byte[] bytes = readLine.getBytes();
                             dos.write(bytes);
                             dos.flush();
                             i = i + 1;
-                            System.out.println("pack=" + i);
+                            System.out.println("date="+date+"\tpack=" + i);
                         }
-                        Thread.sleep(40);
+                        Thread.sleep(20);
                     }
 
                 } catch (IOException | InterruptedException ex) {
